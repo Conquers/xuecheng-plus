@@ -1,8 +1,10 @@
 package com.xuecheng.content.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.xuecheng.content.mapper.TeachplanMapper;
 import com.xuecheng.content.mapper.TeachplanMediaMapper;
+import com.xuecheng.content.model.dto.SaveTeachplanDto;
 import com.xuecheng.content.model.dto.TeachplanDto;
 import com.xuecheng.content.model.po.Teachplan;
 import com.xuecheng.content.model.po.TeachplanMedia;
@@ -10,10 +12,12 @@ import com.xuecheng.content.service.TeachplanService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,5 +85,42 @@ public class TeachplanServiceImpl implements TeachplanService {
         }
 
         return teachplanDtoList;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void saveTeachplan(SaveTeachplanDto teachplanDto) {
+
+        //课程计划id
+        Long id = teachplanDto.getId();
+        //修改课程计划
+        if (id != null) {
+            Teachplan teachplan = teachplanMapper.selectById(id);
+            BeanUtils.copyProperties(teachplanDto, teachplan);
+            teachplanMapper.updateById(teachplan);
+        } else {
+            //取出同父同级别的课程计划最大的orderBy
+            int count = getTeachplanMaxOrderBy(teachplanDto.getCourseId(), teachplanDto.getParentid());
+            Teachplan teachplanNew = new Teachplan();
+            //设置排序号
+            teachplanNew.setOrderby(count + 1);
+            BeanUtils.copyProperties(teachplanDto, teachplanNew);
+
+            teachplanMapper.insert(teachplanNew);
+
+        }
+
+    }
+
+    private int getTeachplanMaxOrderBy(long courseId, long parentId) {
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getCourseId, courseId);
+        queryWrapper.eq(Teachplan::getParentid, parentId);
+        List<Teachplan> teachplans = teachplanMapper.selectList(queryWrapper);
+        Optional<Teachplan> max = teachplans.stream().max(Comparator.comparing(Teachplan::getOrderby));
+        if (max.isPresent()) {
+            return max.get().getOrderby();
+        }
+        return 0;
     }
 }
