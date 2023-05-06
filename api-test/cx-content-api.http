@@ -75,3 +75,7 @@ Content-Type: application/json
   "charge": "201001",
   "price": 0.01
 }
+
+### 查询某个课程的课程计划
+
+GET {{content_host}}/content/teachplan/74/tree-nodes
