@@ -2,6 +2,7 @@ package com.xuecheng.content.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.xuecheng.base.execption.XueChengPlusException;
 import com.xuecheng.content.mapper.TeachplanMapper;
 import com.xuecheng.content.mapper.TeachplanMediaMapper;
 import com.xuecheng.content.model.dto.SaveTeachplanDto;
@@ -110,6 +111,31 @@ public class TeachplanServiceImpl implements TeachplanService {
 
         }
 
+    }
+
+    @Transactional
+    @Override
+    public void delTeachplan(long teachplanId) {
+        Teachplan teachplan = teachplanMapper.selectById(teachplanId);
+        // 二级目录
+        if(teachplan.getGrade() == 2){
+            teachplanMapper.deleteById(teachplanId);
+            QueryWrapper<TeachplanMedia> teachplanMediaQueryWrapper = new QueryWrapper<>();
+            teachplanMediaQueryWrapper.eq("teachplan_id",teachplanId);
+            teachplanMediaMapper.delete(teachplanMediaQueryWrapper);
+        }
+        // 一级目录
+        else{
+            QueryWrapper<Teachplan> teachplanQueryWrapper = new QueryWrapper<>();
+            teachplanQueryWrapper.eq("parentid", teachplanId);
+            List<Teachplan> teachplans = teachplanMapper.selectList(teachplanQueryWrapper);
+            if(teachplans.isEmpty()){
+                teachplanMapper.deleteById(teachplanId);
+            }
+            else{
+                throw new XueChengPlusException("课程计划信息还有子级信息，无法操作");
+            }
+        }
     }
 
     private int getTeachplanMaxOrderBy(long courseId, long parentId) {
