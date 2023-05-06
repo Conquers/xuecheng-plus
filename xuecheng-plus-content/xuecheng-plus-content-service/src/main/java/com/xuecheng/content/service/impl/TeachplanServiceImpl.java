@@ -138,6 +138,55 @@ public class TeachplanServiceImpl implements TeachplanService {
         }
     }
 
+    @Override
+    public void moveTeachplan(String moveType, long teachplanId) {
+        // 拿出需要移动的课程信息
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getId, teachplanId);
+        Teachplan teachplan = teachplanMapper.selectOne(queryWrapper);
+
+        // 拿出需要移动的课程同级目录的所有课程
+        LambdaQueryWrapper<Teachplan> queryWrapperTemp = new LambdaQueryWrapper<>();
+        queryWrapperTemp.eq(Teachplan::getCourseId, teachplan.getCourseId());
+        queryWrapperTemp.eq(Teachplan::getParentid, teachplan.getParentid());
+        List<Teachplan> teachplans = teachplanMapper.selectList(queryWrapperTemp);
+        teachplans.sort(Comparator.comparing(Teachplan::getOrderby));
+
+        // 如果是下移
+        if ("movedown".equals(moveType)) {
+            // 找出下一个的orderby，进行交换
+            int index = teachplans.indexOf(teachplan);
+            int size = teachplans.size() - 1;
+            if (size > index) {
+                Integer orderby1 = teachplans.get(index).getOrderby();
+                Integer orderby2 = teachplans.get(index + 1).getOrderby();
+                teachplans.get(index).setOrderby(orderby2);
+                teachplans.get(index + 1).setOrderby(orderby1);
+                teachplanMapper.updateById(teachplans.get(index));
+                teachplanMapper.updateById(teachplans.get(index + 1));
+            } else {
+                throw new XueChengPlusException("下移失败，已到底");
+            }
+        }
+        // 如果是上移
+        else if ("moveup".equals(moveType)) {
+            // 找出上一个的orderby，进行交换
+            int index = teachplans.indexOf(teachplan);
+            if (index - 1 >= 0) {
+                Integer orderby1 = teachplans.get(index).getOrderby();
+                Integer orderby2 = teachplans.get(index - 1).getOrderby();
+                teachplans.get(index).setOrderby(orderby2);
+                teachplans.get(index - 1).setOrderby(orderby1);
+                teachplanMapper.updateById(teachplans.get(index));
+                teachplanMapper.updateById(teachplans.get(index - 1));
+            } else {
+                throw new XueChengPlusException("上移失败，已到顶");
+            }
+        } else {
+            throw new XueChengPlusException("移动类型错误");
+        }
+    }
+
     private int getTeachplanMaxOrderBy(long courseId, long parentId) {
         LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Teachplan::getCourseId, courseId);
