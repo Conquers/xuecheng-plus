@@ -79,3 +79,14 @@ Content-Type: application/json
 ### 查询某个课程的课程计划
 
 GET {{content_host}}/content/teachplan/74/tree-nodes
+
+
+### 测试网关查询课程基本信息
+POST {{gateway_host}}/content/course/list
+Content-Type: application/json
+
+{
+  "auditStatus": "202004",
+  "courseName": "java",
+  "publishStatus": ""
+}
