@@ -17,14 +17,14 @@ public class BigFileTest {
     //测试文件分块方法
     @Test
     public void testChunk() throws IOException {
-        File sourceFile = new File("D:\\Project\\xuecheng\\xuecheng-plus\\upload\\1.mp4");
+        File sourceFile = new File("D:\\Project\\xuecheng\\xuecheng-plus\\upload\\minio测试视频.mp4");
         String chunkPath = "D:/Project/xuecheng/xuecheng-plus/bigfile_test/chunk/";
         File chunkFolder = new File(chunkPath);
         if (!chunkFolder.exists()) {
             chunkFolder.mkdirs();
         }
         //分块大小:1M
-        long chunkSize = 1024 * 1024 * 1;
+        long chunkSize = 1024 * 1024 * 5;
         //分块数量
         long chunkNum = (long) Math.ceil(sourceFile.length() * 1.0 / chunkSize);
         System.out.println("分块总数：" + chunkNum);
