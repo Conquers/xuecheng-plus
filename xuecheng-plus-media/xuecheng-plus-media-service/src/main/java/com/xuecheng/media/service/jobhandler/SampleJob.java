@@ -1,5 +1,6 @@
 package com.xuecheng.media.service.jobhandler;
 
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
@@ -23,5 +24,17 @@ public class SampleJob {
 
     }
 
+    /**
+     * 2、分片广播任务
+     */
+    @XxlJob("shardingJobHandler")
+    public void shardingJobHandler() throws Exception {
+        // 分片序号，从0开始
+        int shardIndex = XxlJobHelper.getShardIndex();
+        // 分片总数
+        int shardTotal = XxlJobHelper.getShardTotal();
+        System.out.println("shardIndex = " + shardIndex);
+        System.out.println("shardTotal = " + shardTotal);
+    }
 }
 

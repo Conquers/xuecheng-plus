@@ -32,16 +32,13 @@ public class Mp4VideoUtil extends VideoUtil {
      */
     public String generateMp4(){
         //清除已生成的mp4
-//        clear_mp4(mp4folder_path+mp4_name);
         clear_mp4(mp4folder_path);
         /*
         ffmpeg.exe -i  lucene.avi -c:v libx264 -s 1280x720 -pix_fmt yuv420p -b:a 63k -b:v 753k -r 18 .\lucene.mp4
          */
         List<String> commend = new ArrayList<String>();
-        //commend.add("D:\\Program Files\\ffmpeg-20180227-fa0c9d6-win64-static\\bin\\ffmpeg.exe");
         commend.add(ffmpeg_path);
         commend.add("-i");
-//        commend.add("D:\\BaiduNetdiskDownload\\test1.avi");
         commend.add(video_path);
         commend.add("-c:v");
         commend.add("libx264");
@@ -56,8 +53,7 @@ public class Mp4VideoUtil extends VideoUtil {
         commend.add("753k");
         commend.add("-r");
         commend.add("18");
-//        commend.add(mp4folder_path  + mp4_name );
-        commend.add(mp4folder_path  );
+        commend.add(mp4folder_path);
         String outstring = null;
         try {
             ProcessBuilder builder = new ProcessBuilder();
@@ -75,7 +71,8 @@ public class Mp4VideoUtil extends VideoUtil {
 //        Boolean check_video_time = this.check_video_time(video_path, mp4folder_path + mp4_name);
         Boolean check_video_time = this.check_video_time(video_path, mp4folder_path);
         if(!check_video_time){
-            return outstring;
+            return "视频时长不一致";
+//            return outstring;
         }else{
             return "success";
         }
