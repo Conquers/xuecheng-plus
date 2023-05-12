@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -144,6 +145,22 @@ public class VideoTask {
         //等待,给一个充裕的超时时间,防止无限等待，到达超时时间还没有处理完成则结束任务
         countDownLatch.await(30, TimeUnit.MINUTES);
     }
+
+    @XxlJob("taskCompensationMechanismHandler")
+    public void taskCompensationMechanismHandler() {
+        List<MediaProcess> mediaProcessList = mediaFileProcessService.getMediaProcessList();
+        for (MediaProcess mediaProcess : mediaProcessList) {
+            if (mediaProcess.getFailCount() < 3) {
+                // 获取创建后的时30分钟
+                LocalDateTime deadline = mediaProcess.getCreateDate().plusMinutes(30);
+                LocalDateTime now = LocalDateTime.now();
+                if (now.isAfter(deadline)) {
+                    mediaFileProcessService.saveProcessFinishStatus(mediaProcess.getId(), "3", mediaProcess.getFileId(), null, "超时");
+                }
+            }
+        }
+    }
+
 
     private String getFilePath(String fileMd5, String fileExt) {
         return fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/" + fileMd5 + fileExt;

@@ -45,6 +45,11 @@ public class MediaFileProcessServiceImpl implements MediaFileProcessService {
         return mediaProcesses;
     }
 
+    @Override
+    public List<MediaProcess> getMediaProcessList() {
+        return  mediaProcessMapper.selectList(null);
+    }
+
 
     @Override
     public boolean startTask(long id) {

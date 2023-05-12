@@ -24,6 +24,12 @@ public interface MediaFileProcessService {
     public List<MediaProcess> getMediaProcessList(int shardIndex, int shardTotal, int count);
 
     /**
+     *
+     * @return 所有待处理任务
+     */
+    public List<MediaProcess> getMediaProcessList();
+
+    /**
      * 开启一个任务
      *
      * @param id 任务id
