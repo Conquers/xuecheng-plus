@@ -78,7 +78,8 @@ public class MediaFileServiceImpl implements MediaFileService {
 
         //构建查询条件对象
         LambdaQueryWrapper<MediaFiles> queryWrapper = new LambdaQueryWrapper<>();
-
+        // 根据名称过滤视频
+        queryWrapper.like(MediaFiles::getFilename, queryMediaParamsDto.getFilename());
         //分页对象
         Page<MediaFiles> page = new Page<>(pageParams.getPageNo(), pageParams.getPageSize());
         // 查询数据内容获得结果
@@ -243,9 +244,10 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     /**
      * 添加待处理任务
+     *
      * @param mediaFiles 媒资文件信息
      */
-    private void addWaitingTask(MediaFiles mediaFiles){
+    private void addWaitingTask(MediaFiles mediaFiles) {
         //文件名称
         String filename = mediaFiles.getFilename();
         //文件扩展名
@@ -253,9 +255,9 @@ public class MediaFileServiceImpl implements MediaFileService {
         //文件mimeType
         String mimeType = getMimeType(extension);
         //如果是avi视频添加到视频待处理表
-        if(mimeType.equals("video/x-msvideo")){
+        if (mimeType.equals("video/x-msvideo")) {
             MediaProcess mediaProcess = new MediaProcess();
-            BeanUtils.copyProperties(mediaFiles,mediaProcess);
+            BeanUtils.copyProperties(mediaFiles, mediaProcess);
             mediaProcess.setStatus("1");//未处理
             mediaProcess.setFailCount(0);//失败次数默认为0
             mediaProcess.setUrl(null);
