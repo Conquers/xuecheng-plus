@@ -28,4 +28,14 @@ public interface CoursePublishService {
      * @date 2022/9/18 10:31
      */
     void commitAudit(Long companyId, Long courseId);
+
+    /**
+     * @param companyId 机构id
+     * @param courseId  课程id
+     * @return void
+     * @description 课程发布接口
+     * @author Mr.M
+     * @date 2022/9/20 16:23
+     */
+    void publish(Long companyId, Long courseId);
 }
