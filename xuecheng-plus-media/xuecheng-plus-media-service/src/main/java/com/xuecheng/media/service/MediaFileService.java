@@ -35,11 +35,12 @@ public interface MediaFileService {
      * 上传文件
      *
      * @param companyId           机构id
-     * @param uploadFileParamsDto 文件信息
-     * @param localFilePath       文件本地路径
-     * @return UploadFileResultDto
+     * @param uploadFileParamsDto 上传文件信息
+     * @param localFilePath       文件磁盘路径
+     * @param objectName          对象名
+     * @return 文件信息
      */
-    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath);
+    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath, String objectName);
 
     public MediaFiles addMediaFilesToDb(Long companyId, String fileMd5, UploadFileParamsDto uploadFileParamsDto, String bucket, String objectName);
 
@@ -109,6 +110,7 @@ public interface MediaFileService {
 
     /**
      * 根据媒资id查询文件信息
+     *
      * @param mediaId
      * @return
      */
